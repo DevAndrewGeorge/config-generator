@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/devandrewgeorge/generator/internal/pkg/cmd/generator"
+	"github.com/devandrewgeorge/config-generator/internal/pkg/cmd/generator"
 )
 
 func main() {
