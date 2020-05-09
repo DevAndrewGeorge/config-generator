@@ -5,6 +5,11 @@
 # You may explicitly override these cosmetic names or create as many additional cosmetically named plugins.
 # Any configuration option not explictly overridden will fallback to its default.
 plugins:
+  # `console` plugin
+  # Populates variables with values supplied by the user at runtime.
+  console:
+    console:
+
   # `environment` plugin
   # Populates variables with environment variables.
   environment:
@@ -18,6 +23,10 @@ plugins:
   file:
     file:
 
+  # `http` plugin
+  http:
+    http:
+
   # `kubernetes` plugin
   # Populates variables with values from ConfigMaps or Secrets.
   kubernetes:
@@ -28,11 +37,6 @@ plugins:
   # A special plugin that iterates through listed plugins until one returns successfully.
   multi:
     multi:
-
-  # `console` plugin
-  # Populates variables with values supplied by the user at runtime.
-  console:
-    console:
 
   # `static` plugin
   # Populates variables with statically assigned values.
@@ -101,6 +105,17 @@ variables:
   file-variable-2:
     file: /path/to/directory
 
+  # Exposes to templates the response body of an HTTP request.
+  # "verify" has no effect on HTTP requests.
+  # "body" has no effect on HTTP methods that do not require a body.
+  http-variable-1:
+    http:
+      url: https://localhost
+      verify: true
+      method: post
+      headers: {}
+      body: {}
+
   # Exposes to templates a dictionary whose keys are keys in the ConfigMap/Secret and whose values are associated plaintext.
   # "kind" be be either "ConfigMap" or "Secret".
   kubernetes-variable-1:
@@ -154,7 +169,6 @@ variables:
     - static: 8.8.8.8
 
   # Below is an ehaustive list of all validation tests.
-  # This example shows a (poor) attempt at validating an ip address
   validate-example:
     validate:
     - regex: "[0-9.]+"
@@ -280,6 +294,25 @@ outputs:
   file-output-2:
     template: nested-template
     file: /path/to/directory
+
+  # Submits the rendered template as the body of an HTTP "method" request to the given URL.
+  http-output-1:
+    template: flat-inline-template
+    http:
+      url: https://localhost
+      verify: true
+      method: post
+      headers: {}
+
+  # Submits the rendered and coerced template as the body of an HTTP "method" request to the given URL.
+  http-output-2:
+    template: nested-template
+    format: json
+    http:
+      url: https://example.com
+      verify: true
+      method: post
+      headers: {}
 
   # Creates a ConfigMap or Secret.
   # If name is omitted, defaults to the name of the template.
