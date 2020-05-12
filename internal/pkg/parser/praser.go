@@ -2,20 +2,13 @@ package parser
 
 import (
   "io/ioutil"
-  "github.com/devandrewgeorge/config-generator/internal/pkg/generator"
   "github.com/sirupsen/logrus"
+  "github.com/devandrewgeorge/config-generator/internal/pkg/generator"
 )
 
 var log *logrus.Entry
 func init() {
   log = logrus.WithField("scope", "praser")
-}
-
-type GeneratorConfig struct {
-	Plugins   map[string]interface{}
-	Variables map[string]interface{}
-	Templates map[string]interface{}
-	Outputs   map[string]interface{}
 }
 
 func ParseFile(config_path string) (*generator.Generator, error) {
@@ -27,5 +20,5 @@ func ParseFile(config_path string) (*generator.Generator, error) {
 }
 
 func Parse(config []byte) (*generator.Generator, error) {
-  return nil, nil
+  return generator.New(), nil
 }
