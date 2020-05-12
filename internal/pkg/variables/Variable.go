@@ -7,5 +7,27 @@ import (
 type Variable struct {
 	required    bool
 	sensitive   bool
-	validations []validators.Validator `yaml:"validate"`
+	validators []validators.Validator `yaml:"validate"`
+}
+
+func (v Variable) Equal(o Variable) bool {
+  if v.required != o.required {
+    return false
+  }
+
+  if v.sensitive != o.sensitive {
+    return false
+  }
+
+  if len(v.validators) != len(o.validators) {
+    return false
+  }
+
+  for i, validator := range v.validators {
+    if !validator.Equal(o.validators[i]) {
+      return false
+    }
+  }
+
+  return true
 }

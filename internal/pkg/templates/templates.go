@@ -1,3 +1,5 @@
 package templates
 
-type Template struct {}
+type Template interface {
+  Equal(Template) bool
+}
