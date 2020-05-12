@@ -13,3 +13,13 @@ type Generator struct {
   Templates map[string]templates.Template
   Outputs map[string]outputs.Output
 }
+
+func New() (*Generator) {
+  g := &Generator{}
+
+  for name, create := range plugins.Plugins {
+    g.Plugins[name] = create()
+  }
+
+  return g
+}
