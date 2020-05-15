@@ -1,0 +1,21 @@
+plugins:
+
+variables:
+  ca_path:
+    static: ca.pem
+
+  ca_password:
+    prompt:
+
+  subject:
+    sensitive: false
+    prompt:
+
+templates:
+  sign.sh: |
+    openssl req -new -nodes -subj "{{ subject }}" -keyout key.pem -out csr.pem
+    openssl x509 -req -in csr.pem -out cert.pem -CA ca.pem -CAcreateserial <<< {{ ca_password }}
+
+outputs:
+  sign.sh:
+    script:
