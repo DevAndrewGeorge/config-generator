@@ -19,8 +19,13 @@ func NewScriptPlugin() Plugin {
   }
 }
 
-func (s *ScriptPlugin) Equal(o Plugin) bool {
-  return Plugin(s) == o
+func (s *ScriptPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*ScriptPlugin)
+  if ok {
+    return *s == *a
+  }
+
+  return false
 }
 
 func (s *ScriptPlugin) Configure(settings map[string]interface{}) error {

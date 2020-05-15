@@ -10,8 +10,13 @@ func NewKubernetesPlugin() Plugin {
   }
 }
 
-func (k *KubernetesPlugin) Equal(o Plugin) bool {
-  return Plugin(k) == o
+func (k *KubernetesPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*KubernetesPlugin)
+  if ok {
+    return *k == *a
+  }
+
+  return false
 }
 
 func (k *KubernetesPlugin) Configure(settings map[string]interface{}) error {

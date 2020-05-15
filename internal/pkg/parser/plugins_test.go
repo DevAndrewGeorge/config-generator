@@ -7,8 +7,16 @@ import (
 
 func TestParsePlugin (t *testing.T) {
   var empty_config map[string]interface{}
+
+  t.Run("plugin, invalid", func (t *testing.T) {
+    _, e := parsePlugin("blah", "blah", empty_config)
+    if e == nil {
+      t.Fail()
+    }
+  })
+
   t.Run("plugin: console", func(t *testing.T) {
-    p, e := parsePlugin("console", empty_config)
+    p, e := parsePlugin("console", "console", empty_config)
     if e != nil {
       t.Fail()
     }
@@ -19,7 +27,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: environment", func(t *testing.T) {
-    p, e := parsePlugin("environment", empty_config)
+    p, e := parsePlugin("environment", "environment", empty_config)
 
     if e != nil {
       t.Fail()
@@ -31,7 +39,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: file", func(t *testing.T) {
-    p, e := parsePlugin("file", empty_config)
+    p, e := parsePlugin("file", "file", empty_config)
 
     if e != nil {
       t.Fail()
@@ -43,7 +51,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: http", func(t *testing.T) {
-    p, e := parsePlugin("http", empty_config)
+    p, e := parsePlugin("http", "http", empty_config)
 
     if e != nil {
       t.Fail()
@@ -55,7 +63,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: kubernetes", func(t *testing.T) {
-    p, e := parsePlugin("kubernetes", empty_config)
+    p, e := parsePlugin("kubernetes", "kubernetes", empty_config)
 
     if e != nil {
       t.Fail()
@@ -67,7 +75,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: multi", func(t *testing.T) {
-    p, e := parsePlugin("multi", empty_config)
+    p, e := parsePlugin("multi", "multi", empty_config)
 
     if e != nil {
       t.Fail()
@@ -79,7 +87,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: script", func(t *testing.T) {
-    p, e := parsePlugin("script", empty_config)
+    p, e := parsePlugin("script", "script", empty_config)
 
     if e != nil {
       t.Fail()
@@ -91,7 +99,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: static", func(t *testing.T) {
-    p, e := parsePlugin("static", empty_config)
+    p, e := parsePlugin("static", "static", empty_config)
 
     if e != nil {
       t.Fail()
@@ -103,7 +111,7 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("plugin: vault", func(t *testing.T) {
-    p, e := parsePlugin("vault", empty_config)
+    p, e := parsePlugin("vault", "vault", empty_config)
 
     if e != nil {
       t.Fail()
@@ -118,7 +126,7 @@ func TestParsePlugin (t *testing.T) {
     config := map[string]interface{}{"file": "hello"}
     expected := plugins.NewEnvironmentPlugin()
     expected.Configure(config)
-    p, e := parsePlugin("environment", config)
+    p, e := parsePlugin("environment", "environment", config)
 
     if e != nil {
       t.Fail()

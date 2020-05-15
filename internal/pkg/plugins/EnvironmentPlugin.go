@@ -8,8 +8,13 @@ func NewEnvironmentPlugin() Plugin {
   return &EnvironmentPlugin{}
 }
 
-func (e *EnvironmentPlugin) Equal(o Plugin) bool {
-  return Plugin(e) == o
+func (e *EnvironmentPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*EnvironmentPlugin)
+  if ok {
+    return *e == *a
+  }
+
+  return false
 }
 
 func (e *EnvironmentPlugin) Configure(settings map[string]interface{}) error {

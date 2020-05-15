@@ -51,8 +51,13 @@ func NewVaultPlugin() Plugin {
   return &v
 }
 
-func (v *VaultPlugin) Equal(o Plugin) bool {
-  return Plugin(v) == o
+func (v *VaultPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*VaultPlugin)
+  if ok {
+    return *v == *a
+  }
+
+  return false
 }
 
 func (v *VaultPlugin) Configure(settings map[string]interface{}) error {

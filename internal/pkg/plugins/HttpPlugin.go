@@ -6,8 +6,13 @@ func NewHttpPlugin() Plugin {
   return &HttpPlugin{}
 }
 
-func (h *HttpPlugin) Equal(o Plugin) bool {
-  return Plugin(h) == o
+func (h *HttpPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*HttpPlugin)
+  if ok {
+    return *h == *a
+  }
+  
+  return false
 }
 
 func (h *HttpPlugin) Configure(settings map[string]interface{}) error {
