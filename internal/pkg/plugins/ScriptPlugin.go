@@ -1,5 +1,10 @@
 package plugins
 
+import (
+  "os"
+  "os/user"
+)
+
 type ScriptPlugin struct {
   shell string
   user string
@@ -7,9 +12,58 @@ type ScriptPlugin struct {
 }
 
 func NewScriptPlugin() Plugin {
-  return &ScriptPlugin{}
+  return &ScriptPlugin{
+    shell: "/bin/bash",
+    user: string(os.Getuid()),
+    group: string(os.Getgid()),
+  }
 }
 
-func (s ScriptPlugin) Equal(o Plugin) bool {
+func (s *ScriptPlugin) Equal(o Plugin) bool {
   return Plugin(s) == o
+}
+
+func (s *ScriptPlugin) Configure(settings map[string]interface{}) error {
+  if shell, ok := settings["shell"]; ok {
+    s.shell = shell.(string)
+  }
+
+  if u, ok := settings["user"]; ok {
+    var script_user *user.User
+    var err error
+
+    user_string, _ := u.(string)
+    if _, isInt := u.(int); isInt {
+      script_user, err = user.LookupId(user_string)
+    } else {
+      script_user, err = user.Lookup(user_string)
+    }
+
+    if err != nil {
+      return err
+    }
+
+    s.user = string(script_user.Uid)
+  }
+
+  if g, ok := settings["group"]; ok {
+    var script_group *user.Group
+    var err error
+
+    group_string, _ := g.(string)
+
+    if _, isInt := g.(int); isInt {
+      script_group, err = user.LookupGroupId(group_string)
+    } else {
+      script_group, err = user.LookupGroup(group_string)
+    }
+
+    if err != nil {
+      return err
+    }
+
+    s.group = string(script_group.Gid)
+  }
+
+  return nil
 }
