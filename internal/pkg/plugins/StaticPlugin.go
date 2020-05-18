@@ -1,6 +1,8 @@
 package plugins
 
-type StaticPlugin struct {}
+type StaticPlugin struct {
+  name string
+}
 
 func NewStaticPlugin() Plugin {
   return &StaticPlugin{}
@@ -15,6 +17,7 @@ func (s *StaticPlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (s *StaticPlugin) Configure(settings map[string]interface{}) error {
+func (s *StaticPlugin) Configure(name string, settings map[string]interface{}) error {
+  s.name = name
   return nil
 }

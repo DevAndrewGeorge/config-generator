@@ -17,8 +17,8 @@ func TestNewKubernetesPlugin(t *testing.T) {
 
 func TestKubernetesPluginConfigure(t *testing.T) {
   k := NewKubernetesPlugin().(*KubernetesPlugin)
-  k.Configure(map[string]interface{}{"kubeconfig": "testing"})
-  if k.kubeconfig_path != "testing" {
+  k.Configure("test", map[string]interface{}{"kubeconfig": "testing"})
+  if k.name != "test" || k.kubeconfig_path != "testing" {
     t.Fail()
   }
 }

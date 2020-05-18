@@ -6,6 +6,7 @@ import (
 )
 
 type ScriptPlugin struct {
+  name string
   shell string
   user string
   group string
@@ -28,7 +29,8 @@ func (s *ScriptPlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (s *ScriptPlugin) Configure(settings map[string]interface{}) error {
+func (s *ScriptPlugin) Configure(name string, settings map[string]interface{}) error {
+  s.name = name
   if shell, ok := settings["shell"]; ok {
     s.shell = shell.(string)
   }

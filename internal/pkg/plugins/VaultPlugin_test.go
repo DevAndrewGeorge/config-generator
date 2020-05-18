@@ -43,7 +43,7 @@ func TestNewVaultPlugin(t *testing.T) {
 
 func TestVaultPluginConfigure(t *testing.T) {
   v := NewVaultPlugin().(*VaultPlugin)
-  v.Configure(map[string]interface{}{
+  v.Configure("test", map[string]interface{}{
     "token": "testing",
     "address": "testing",
     "ca_cert": "testing",
@@ -51,7 +51,8 @@ func TestVaultPluginConfigure(t *testing.T) {
     "skip_verify": true,
   })
 
-  if v.token != "testing" ||
+  if v.name != "test" ||
+     v.token != "testing" ||
      v.address != "testing" ||
      v.cacert_path != "testing" ||
      v.capath != "testing" ||

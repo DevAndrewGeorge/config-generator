@@ -1,6 +1,8 @@
 package plugins
 
-type FilePlugin struct {}
+type FilePlugin struct {
+  name string
+}
 
 func NewFilePlugin() Plugin {
   return &FilePlugin{}
@@ -15,6 +17,7 @@ func (f *FilePlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (f *FilePlugin) Configure(settings map[string]interface{}) error {
+func (f *FilePlugin) Configure(name string, settings map[string]interface{}) error {
+  f.name = name
   return nil
 }

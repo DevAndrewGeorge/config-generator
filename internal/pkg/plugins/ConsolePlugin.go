@@ -1,6 +1,7 @@
 package plugins
 
 type ConsolePlugin struct {
+  name string
 }
 
 func NewConsolePlugin() Plugin {
@@ -16,6 +17,7 @@ func (c *ConsolePlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (c *ConsolePlugin) Configure(map[string]interface{}) error {
+func (c *ConsolePlugin) Configure(name string, config map[string]interface{}) error {
+  c.name = name
   return nil
 }

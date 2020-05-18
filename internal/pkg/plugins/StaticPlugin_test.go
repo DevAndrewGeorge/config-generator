@@ -10,4 +10,8 @@ func TestNewStaticPlugin(t *testing.T) {
   }
 }
 
-func TestStaticPluginConfigure(t *testing.T) {}
+func TestStaticPluginConfigure(t *testing.T) {
+  s := NewStaticPlugin().(*StaticPlugin)
+  s.Configure("test", nil)
+  if s.name != "test" { t.Fail() }
+}

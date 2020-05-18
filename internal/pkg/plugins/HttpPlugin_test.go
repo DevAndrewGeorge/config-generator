@@ -10,4 +10,8 @@ func TestNewHttpPlugin(t *testing.T) {
   }
 }
 
-func TestHttpPluginConfigure(t *testing.T) {}
+func TestHttpPluginConfigure(t *testing.T) {
+  h := NewHttpPlugin().(*HttpPlugin)
+  h.Configure("test", nil)
+  if h.name != "test" { t.Fail() }
+}

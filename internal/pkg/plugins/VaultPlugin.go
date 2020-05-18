@@ -6,6 +6,7 @@ import(
 )
 
 type VaultPlugin struct {
+  name string
   token string
   address string
   cacert_path string
@@ -60,7 +61,9 @@ func (v *VaultPlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (v *VaultPlugin) Configure(settings map[string]interface{}) error {
+func (v *VaultPlugin) Configure(name string, settings map[string]interface{}) error {
+  v.name = name
+  
   if token, ok := settings["token"]; ok {
     v.token = token.(string)
   }

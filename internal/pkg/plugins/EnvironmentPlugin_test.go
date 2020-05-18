@@ -12,9 +12,9 @@ func TestNewEnvironmentPlugin(t *testing.T) {
 
 func TestEnvironmentPluginConfigure(t *testing.T) {
   e := NewEnvironmentPlugin().(*EnvironmentPlugin)
-  e.Configure(map[string]interface{}{"file": "testing"})
+  e.Configure("test", map[string]interface{}{"file": "testing"})
 
-  if e.file != "testing" {
+  if e.name != "test" || e.file != "testing" {
     t.Fail()
   }
 }

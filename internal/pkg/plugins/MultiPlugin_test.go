@@ -10,4 +10,10 @@ func TestNewMultiPlugin(t *testing.T) {
   }
 }
 
-func TestMultiPluginConfigure(t *testing.T) {}
+func TestMultiPluginConfigure(t *testing.T) {
+  m := NewMultiPlugin().(*MultiPlugin)
+  m.Configure("test", nil)
+  if m.name != "test" {
+    t.Fail()
+  }
+}

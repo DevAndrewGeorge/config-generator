@@ -1,6 +1,8 @@
 package plugins
 
-type MultiPlugin struct {}
+type MultiPlugin struct {
+  name string
+}
 
 func NewMultiPlugin() Plugin {
   return &MultiPlugin{}
@@ -15,6 +17,7 @@ func (m *MultiPlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (m *MultiPlugin) Configure(settings map[string]interface{}) error {
+func (m *MultiPlugin) Configure(name string, settings map[string]interface{}) error {
+  m.name = name
   return nil
 }
