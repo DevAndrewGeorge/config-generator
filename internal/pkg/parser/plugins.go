@@ -1,24 +1,21 @@
 package parser
 
 import (
-  "errors"
+  log "github.com/sirupsen/logrus"
   "github.com/devandrewgeorge/config-generator/internal/pkg/plugins"
 )
 
-func parsePlugin(plugin_name string, plugin_type string, config map[string]interface{}) (plugins.Plugin, error) {
-  createPluginFunc, ok := plugins.Plugins[plugin_type]
-  if !ok {
-    msg := "not a valid plugin type"
-    log.WithField("name", plugin_type).Error(msg)
-    return nil, errors.New(msg)
+func parsePlugins(all_named_plugin_configs map[string]*NamedPluginConfig) (map[string]plugins.Plugin, error) {
+  all_plugins := map[string]plugins.Plugin{}
+  for plugin_name, named_plugin_config := range all_named_plugin_configs {
+    plugin, err := named_plugin_config.GetPlugin(plugin_name)
+    if err != nil {
+      log.WithField("scope", "plugins").WithField("name", plugin_name).Error(err.Error())
+      return nil, err
+    }
+
+    all_plugins[plugin_name] = plugin
   }
 
-  plugin := createPluginFunc()
-  if plugin.Configure(config) != nil {
-    msg := "failed to configure plugin"
-    log.WithField("name", plugin_name).Error(msg)
-    return nil, errors.New(msg)
-  }
-
-  return plugin, nil
+  return all_plugins, nil
 }
