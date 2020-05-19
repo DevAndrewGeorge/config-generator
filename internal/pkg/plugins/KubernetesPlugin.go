@@ -1,5 +1,9 @@
 package plugins
 
+import(
+  "reflect"
+)
+
 type KubernetesPlugin struct {
   name string
   kubeconfig_path string
@@ -22,8 +26,8 @@ func (k *KubernetesPlugin) Equal(p Plugin) bool {
 
 func (k *KubernetesPlugin) Configure(name string, settings map[string]interface{}) error {
   k.name = name
-  if config_path, ok := settings["kubeconfig"]; ok {
-    k.kubeconfig_path = config_path.(string)
+  if config_path, ok := settings["Kubeconfig"]; ok && !reflect.ValueOf(config_path).IsNil() {
+      k.kubeconfig_path = *config_path.(*string)
   }
 
   return nil

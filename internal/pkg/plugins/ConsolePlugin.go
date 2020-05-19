@@ -17,7 +17,7 @@ func (c *ConsolePlugin) Equal(p Plugin) bool {
   return false
 }
 
-func (c *ConsolePlugin) Configure(name string, config map[string]interface{}) error {
+func (c *ConsolePlugin) Configure(name string, settings map[string]interface{}) error {
   c.name = name
   return nil
 }
