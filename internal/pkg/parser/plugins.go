@@ -5,10 +5,10 @@ import (
   "github.com/devandrewgeorge/config-generator/internal/pkg/plugins"
 )
 
-func parsePlugins(all_named_plugin_configs map[string]*NamedPluginConfig) (map[string]plugins.Plugin, error) {
+func parsePlugins(all_named_plugin_configs map[string]*namedPluginConfig) (map[string]plugins.Plugin, error) {
   all_plugins := map[string]plugins.Plugin{}
   for plugin_name, named_plugin_config := range all_named_plugin_configs {
-    plugin, err := named_plugin_config.GetPlugin(plugin_name)
+    plugin, err := named_plugin_config.getPlugin(plugin_name)
     if err != nil {
       log.WithField("scope", "plugins").WithField("name", plugin_name).Error(err.Error())
       return nil, err

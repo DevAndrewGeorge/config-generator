@@ -15,16 +15,16 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("named plugins map is empty", func(t *testing.T) {
-    plugins, error := parsePlugins(map[string]*NamedPluginConfig{})
+    plugins, error := parsePlugins(map[string]*namedPluginConfig{})
     if error != nil || len(plugins) != 0 {
       t.Fail()
     }
   })
 
   t.Run("named plugins map contains a properly configured named plugin", func(t *testing.T) {
-    input := map[string]*NamedPluginConfig{
-      "test": &NamedPluginConfig{
-        Environment: &EnvironmentPluginConfig{ File: &test_string },
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{ File: &test_string },
       },
     }
     expected := &plugins.EnvironmentPlugin{}
@@ -36,12 +36,12 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("named plugins map contains multiple properly configured named plugins", func(t *testing.T) {
-    input := map[string]*NamedPluginConfig{
-      "test1": &NamedPluginConfig{
-        Environment: &EnvironmentPluginConfig{ File: &test_string },
+    input := map[string]*namedPluginConfig{
+      "test1": &namedPluginConfig{
+        Environment: &environmentPluginConfig{ File: &test_string },
       },
-      "test2": &NamedPluginConfig{
-        Console: &ConsolePluginConfig{},
+      "test2": &namedPluginConfig{
+        Console: &consolePluginConfig{},
       },
     }
 
@@ -52,18 +52,18 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("named plugin contains no actual plugin configuration", func(t *testing.T) {
-    input := map[string]*NamedPluginConfig{
-      "test": &NamedPluginConfig{},
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{},
     }
 
     if _, error := parsePlugins(input); error == nil { t.Fail() }
   })
 
   t.Run("actual plugin configuration has multiple configurations", func (t *testing.T) {
-    input := map[string]*NamedPluginConfig{
-      "test": &NamedPluginConfig{
-        Environment: &EnvironmentPluginConfig{},
-        Console: &ConsolePluginConfig{},
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{},
+        Console: &consolePluginConfig{},
       },
     }
 
@@ -73,9 +73,9 @@ func TestParsePlugin (t *testing.T) {
   })
 
   t.Run("actual plugin configuration map is empty", func (t *testing.T) {
-    input := map[string]*NamedPluginConfig{
-      "test": &NamedPluginConfig{
-        Environment: &EnvironmentPluginConfig{},
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{},
       },
     }
     expected := &plugins.EnvironmentPlugin{}

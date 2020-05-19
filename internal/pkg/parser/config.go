@@ -10,50 +10,50 @@ import(
 )
 
 type GeneratorConfig struct {
-  Plugins   map[string]*NamedPluginConfig
+  Plugins   map[string]*namedPluginConfig
   Variables map[string]map[string]interface{} // *NamedVariable
   Templates map[string]interface{} // *NamedTemplate
   Outputs   map[string]map[string]interface{} // *NamedOutput
 }
 
-type NamedPluginConfig struct {
-  Console     *ConsolePluginConfig
-  Environment *EnvironmentPluginConfig
-  File        *FilePluginConfig
-  Http        *HttpPluginConfig
-  Kubernetes  *KubernetesPluginConfig
-  Multi       *MultiPluginConfig
-  Script      *ScriptPluginConfig
-  Static      *StaticPluginConfig
-  Vault       *VaultPluginConfig
+type namedPluginConfig struct {
+  Console     *consolePluginConfig
+  Environment *environmentPluginConfig
+  File        *filePluginConfig
+  Http        *httpPluginConfig
+  Kubernetes  *kubernetesPluginConfig
+  Multi       *multiPluginConfig
+  Script      *scriptPluginConfig
+  Static      *staticPluginConfig
+  Vault       *vaultPluginConfig
 }
 
-type ConsolePluginConfig struct { Test *string }
+type consolePluginConfig struct { Test *string }
 
-type EnvironmentPluginConfig struct {
+type environmentPluginConfig struct {
   File *string
 }
 
-type FilePluginConfig struct {}
+type filePluginConfig struct {}
 
-type HttpPluginConfig struct {}
+type httpPluginConfig struct {}
 
 
-type KubernetesPluginConfig struct {
+type kubernetesPluginConfig struct {
   Kubeconfig *string
 }
 
-type MultiPluginConfig struct {}
+type multiPluginConfig struct {}
 
-type ScriptPluginConfig struct {
+type scriptPluginConfig struct {
   Shell *string
   User  *string
   Group *string
 }
 
-type StaticPluginConfig struct {}
+type staticPluginConfig struct {}
 
-type VaultPluginConfig struct {
+type vaultPluginConfig struct {
   Token       *string
   Address     *string
   CAcert      *string `yaml:"ca_cert"`
@@ -61,7 +61,7 @@ type VaultPluginConfig struct {
   SkipVerify  *bool   `yaml:"skip_verify"`
 }
 
-func (named_plugin *NamedPluginConfig) GetPlugin(plugin_name string) (plugins.Plugin, error) {
+func (named_plugin *namedPluginConfig) getPlugin(plugin_name string) (plugins.Plugin, error) {
   named_plugin_config := structs.New(named_plugin).Map()
 
   num_configurations := 0
