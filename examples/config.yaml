@@ -8,7 +8,7 @@ plugins:
   # `console` plugin
   # Populates variables with values supplied by the user at runtime.
   console:
-    console:
+    console: {}
 
   # `environment` plugin
   # Populates variables with environment variables.
@@ -21,11 +21,11 @@ plugins:
   # `file` plugin
   # Populates variables with the contents of a file.
   file:
-    file:
+    file: {}
 
   # `http` plugin
   http:
-    http:
+    http: {}
 
   # `kubernetes` plugin
   # Populates variables with values from ConfigMaps or Secrets.
@@ -36,12 +36,12 @@ plugins:
   # `multi` plugin
   # A special plugin that iterates through listed plugins until one returns successfully.
   multi:
-    multi:
+    multi: {}
 
   # `static` plugin
   # Populates variables with statically assigned values.
   static:
-    static:
+    static: {}
 
   # `script` plugin
   # Populates variables with the output from an executed script.
