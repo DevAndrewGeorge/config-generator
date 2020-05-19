@@ -7,7 +7,12 @@ import (
 
 type GeneratorFormatter struct {}
 func (f *GeneratorFormatter) Format(entry *log.Entry) ([]byte, error) {
-  log_line := fmt.Sprintf("[%s] [%s] [%s] %s\n", entry.Level, entry.Data["scope"], entry.Data["name"], entry.Message)
+  var format_string string
+  if _, ok := entry.Data["name"]; ok {
+    log_line := fmt.Sprintf("[%s] [%s] [%s] %s\n", entry.Level, entry.Data["scope"], entry.Data["name"], entry.Message)
+  } else {
+    log_line := fmt.Sprintf("[%s] [%s] %s\n", entry.Level, entry.Data["scope"], entry.Message)
+  }
   return []byte(log_line), nil
 }
 

@@ -15,5 +15,5 @@ var Plugins = map[string]ConstructorFunction {
 
 type Plugin interface {
   Equal(Plugin) bool
-  Configure(map[string]interface{}) error
+  Configure(string, map[string]interface{}) error
 }

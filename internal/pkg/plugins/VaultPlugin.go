@@ -2,10 +2,12 @@ package plugins
 
 import(
   "os"
+  "reflect"
   "io/ioutil"
 )
 
 type VaultPlugin struct {
+  name string
   token string
   address string
   cacert_path string
@@ -51,29 +53,36 @@ func NewVaultPlugin() Plugin {
   return &v
 }
 
-func (v *VaultPlugin) Equal(o Plugin) bool {
-  return Plugin(v) == o
+func (v *VaultPlugin) Equal(p Plugin) bool {
+  a, ok := p.(*VaultPlugin)
+  if ok {
+    return *v == *a
+  }
+
+  return false
 }
 
-func (v *VaultPlugin) Configure(settings map[string]interface{}) error {
-  if token, ok := settings["token"]; ok {
-    v.token = token.(string)
+func (v *VaultPlugin) Configure(name string, settings map[string]interface{}) error {
+  v.name = name
+
+  if token, ok := settings["Token"]; ok && !reflect.ValueOf(token).IsNil() {
+    v.token = *token.(*string)
   }
 
-  if address, ok := settings["address"]; ok {
-    v.address = address.(string)
+  if address, ok := settings["Address"]; ok && !reflect.ValueOf(address).IsNil() {
+    v.address = *address.(*string)
   }
 
-  if ca_cert, ok := settings["ca_cert"]; ok {
-    v.cacert_path = ca_cert.(string)
+  if ca_cert, ok := settings["CAcert"]; ok && !reflect.ValueOf(ca_cert).IsNil() {
+    v.cacert_path = *ca_cert.(*string)
   }
 
-  if ca_path, ok := settings["ca_path"]; ok {
-    v.capath = ca_path.(string)
+  if ca_path, ok := settings["CApath"]; ok && !reflect.ValueOf(ca_path).IsNil() {
+    v.capath = *ca_path.(*string)
   }
 
-  if skip_verify, ok := settings["skip_verify"]; ok {
-    v.verify = skip_verify.(bool)
+  if skip_verify, ok := settings["SkipVerify"]; ok && !reflect.ValueOf(skip_verify).IsNil() {
+    v.verify = *skip_verify.(*bool)
   }
 
   return nil

@@ -10,4 +10,8 @@ func TestNewFilePlugin(t *testing.T) {
   }
 }
 
-func TestFilePluginConfigure(t *testing.T) {}
+func TestFilePluginConfigure(t *testing.T) {
+  f := NewFilePlugin().(*FilePlugin)
+  f.Configure("test", nil)
+  if f.name != "test" { t.Fail() }
+}

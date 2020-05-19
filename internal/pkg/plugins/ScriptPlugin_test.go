@@ -31,15 +31,15 @@ func TestScriptPluginConfigure(t *testing.T) {
   }
 
   t.Run("[plugins] [ScriptPlugin.go] Configure() with names", func(t *testing.T) {
-    s.Configure(with_names)
-    if s.shell != "/bin/sh" || s.user != "0" || s.group != "0" {
+    s.Configure("test", with_names)
+    if s.name != "test" || s.shell != "/bin/sh" || s.user != "0" || s.group != "0" {
       t.Fail()
     }
   })
 
   t.Run("[plugins] [ScriptPlugin.go] Configure() with IDs", func(t *testing.T) {
-    s.Configure(with_ids)
-    if s.shell != "/bin/sh" || s.user != "0" || s.group != "0" {
+    s.Configure("test", with_ids)
+    if s.name != "test" || s.shell != "/bin/sh" || s.user != "0" || s.group != "0" {
       t.Fail()
     }
   })

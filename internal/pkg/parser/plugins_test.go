@@ -6,111 +6,83 @@ import (
 )
 
 func TestParsePlugin (t *testing.T) {
-  var empty_config map[string]interface{}
-  t.Run("plugin: console", func(t *testing.T) {
-    g, e := parsePlugin("console", empty_config)
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.ConsolePlugin); !ok {
+  test_string := "test"
+  t.Run("named plugins map is nil", func(t *testing.T) {
+    plugins, err := parsePlugins(nil);
+    if err != nil || len(plugins) != 0 {
       t.Fail()
     }
   })
 
-  t.Run("plugin: environment", func(t *testing.T) {
-    g, e := parsePlugin("environment", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.EnvironmentPlugin); !ok {
+  t.Run("named plugins map is empty", func(t *testing.T) {
+    plugins, error := parsePlugins(map[string]*namedPluginConfig{})
+    if error != nil || len(plugins) != 0 {
       t.Fail()
     }
   })
 
-  t.Run("plugin: file", func(t *testing.T) {
-    g, e := parsePlugin("file", empty_config)
+  t.Run("named plugins map contains a properly configured named plugin", func(t *testing.T) {
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{ File: &test_string },
+      },
+    }
+    expected := &plugins.EnvironmentPlugin{}
+    expected.Configure("test", map[string]interface{}{"File": &test_string})
 
-    if e != nil {
-      t.Fail()
+    plugins, error := parsePlugins(input)
+    if error != nil { t.Fail() }
+    if !plugins["test"].Equal(expected) { t.Fail() }
+  })
+
+  t.Run("named plugins map contains multiple properly configured named plugins", func(t *testing.T) {
+    input := map[string]*namedPluginConfig{
+      "test1": &namedPluginConfig{
+        Environment: &environmentPluginConfig{ File: &test_string },
+      },
+      "test2": &namedPluginConfig{
+        Console: &consolePluginConfig{},
+      },
     }
 
-    if _, ok := g.(plugins.FilePlugin); !ok {
+    plugins, error := parsePlugins(input)
+    if error != nil { t.Fail() }
+    if _, ok := plugins["test1"]; !ok { t.Fail() }
+    if _, ok := plugins["test2"]; !ok { t.Fail() }
+  })
+
+  t.Run("named plugin contains no actual plugin configuration", func(t *testing.T) {
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{},
+    }
+
+    if _, error := parsePlugins(input); error == nil { t.Fail() }
+  })
+
+  t.Run("actual plugin configuration has multiple configurations", func (t *testing.T) {
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{},
+        Console: &consolePluginConfig{},
+      },
+    }
+
+    if _, error := parsePlugins(input); error == nil {
       t.Fail()
     }
   })
 
-  t.Run("plugin: http", func(t *testing.T) {
-    g, e := parsePlugin("http", empty_config)
-
-    if e != nil {
-      t.Fail()
+  t.Run("actual plugin configuration map is empty", func (t *testing.T) {
+    input := map[string]*namedPluginConfig{
+      "test": &namedPluginConfig{
+        Environment: &environmentPluginConfig{},
+      },
     }
+    expected := &plugins.EnvironmentPlugin{}
+    expected.Configure("test", nil)
 
-    if _, ok := g.(plugins.HttpPlugin); !ok {
-      t.Fail()
-    }
-  })
-
-  t.Run("plugin: kubernetes", func(t *testing.T) {
-    g, e := parsePlugin("kubernetes", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.KubernetesPlugin); !ok {
-      t.Fail()
-    }
-  })
-
-  t.Run("plugin: multi", func(t *testing.T) {
-    g, e := parsePlugin("multi", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.MultiPlugin); !ok {
-      t.Fail()
-    }
-  })
-
-  t.Run("plugin: script", func(t *testing.T) {
-    g, e := parsePlugin("script", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.ScriptPlugin); !ok {
-      t.Fail()
-    }
-  })
-
-  t.Run("plugin: static", func(t *testing.T) {
-    g, e := parsePlugin("static", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.StaticPlugin); !ok {
-      t.Fail()
-    }
-  })
-
-  t.Run("plugin: vault", func(t *testing.T) {
-    g, e := parsePlugin("vault", empty_config)
-
-    if e != nil {
-      t.Fail()
-    }
-
-    if _, ok := g.(plugins.VaultPlugin); !ok {
-      t.Fail()
-    }
+    plugins, error := parsePlugins(input)
+    if error != nil { t.Error("error returned") }
+    if !plugins["test"].Equal(expected) { t.Error(plugins["test"], expected) }
   })
 }

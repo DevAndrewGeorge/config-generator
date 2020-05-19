@@ -8,24 +8,24 @@ plugins:
   # `console` plugin
   # Populates variables with values supplied by the user at runtime.
   console:
-    console:
+    console: {}
 
   # `environment` plugin
   # Populates variables with environment variables.
   environment:
-    environment: 
+    environment:
       # If left null, all runtime environment variables are used.
       # Otherwise, must be a path to a file containing lines of NAME=VALUE.
-      file: 
+      file:
 
   # `file` plugin
   # Populates variables with the contents of a file.
   file:
-    file:
+    file: {}
 
   # `http` plugin
   http:
-    http:
+    http: {}
 
   # `kubernetes` plugin
   # Populates variables with values from ConfigMaps or Secrets.
@@ -36,30 +36,29 @@ plugins:
   # `multi` plugin
   # A special plugin that iterates through listed plugins until one returns successfully.
   multi:
-    multi:
+    multi: {}
 
   # `static` plugin
   # Populates variables with statically assigned values.
   static:
-    static:
+    static: {}
 
   # `script` plugin
   # Populates variables with the output from an executed script.
   script:
     script:
-      script:
-        shell: /bin/sh
-        # Defaults to the calling user.
-        user:
-        # Default to the calling group.
-        group:
+      shell: /bin/sh
+      # Defaults to the calling user.
+      user:
+      # Default to the calling group.
+      group:
 
   # `vault` plugin
   # Populates variables with the response body of a Hashicorp Vault request.
   vault:
     vault:
       # Defaults to VAULT_TOKEN environment variable followed by the contents in ~/.vault_token. Otherwise null.
-      token: 
+      token:
       # Defaults to VAULT_ADDR environment variable. Otherwise http://locahost:9200.
       address:
       # Defaults to VAULT_CACERT environment variable. Otherwise null.
@@ -143,7 +142,7 @@ variables:
   # Exposes to templates a string whose value is the output of the script.
   script-variable-2:
     script:
-      path: /path/to/script  
+      path: /path/to/script
 
   # Exposes to templates a dictionary representing Vault's response.
   vault-variable-1:
@@ -349,7 +348,7 @@ outputs:
     template: script-nested-template
     script:
 
-  # Makes a request to Vault at the given path.  
+  # Makes a request to Vault at the given path.
   # The rendered template will become the body of the request if reasonable.
   vault-output-1:
     template: vault-static-template
@@ -357,7 +356,7 @@ outputs:
       path: /secret/data/example
       method: post
 
-  # Makes a request to Vault at the given path. 
+  # Makes a request to Vault at the given path.
   # The rendered template will become the body of the request if reasonable.
   # This is the equivalent of taking a nested template and coercing it into a json string.
   vault-output-2:
