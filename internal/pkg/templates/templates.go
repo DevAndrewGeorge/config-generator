@@ -1,7 +1,7 @@
 package templates
 
 func New(name string, data interface{}) (*Template, error) {
-    return nil, nil
+    return &Template{}, nil
 }
 
 type Template struct {
