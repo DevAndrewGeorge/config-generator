@@ -97,3 +97,16 @@ func TestTemplateEqual(t *testing.T) {
         if t1.Equal(t2) { t.Fail() }
     })
 }
+
+func TestTemplateIsNested(t *testing.T) {
+    t.Run("nested", func(t *testing.T) {
+        t := &Template{}
+        if !t.IsNested() { t.Fail() }
+    })
+
+    t.Run("unnested", func(t *testing.T) {
+        data := "test"
+        t := &Template{text: &data}
+        if t.IsNested() { t.Fail() }
+    })
+}

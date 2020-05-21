@@ -10,6 +10,10 @@ type Template struct {
     templates map[string]*Template
 }
 
+func (t *Template) IsNested() bool {
+    return t.text == nil
+}
+
 func (t *Template) Render(variables map[string]string) (string, error) {
     return "", nil
 }
