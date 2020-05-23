@@ -14,7 +14,7 @@ func TestNew(t *testing.T) {
     })
 
     t.Run("data is incorrect type", func(t *testing.T) {
-        var i interface{}
+        var i int
         if _, err := New("test", i); err == nil { t.Fail() }
     })
 
@@ -33,28 +33,28 @@ func TestNew(t *testing.T) {
         temp.Write([]byte(data))
         temp.Close()
 
-        actual, err := New("", map[string]interface{}{"file": filename})
+        actual, err := New("", map[string]interface{}{"file": temp.Name()})
         expected := &Template{text: &data}
 
-        if err != nil || !actual.Equal(expected) { t.Fail() }
+        if err != nil || !actual.Equal(expected) { t.Error(expected, actual, err) }
 
-        os.Remove(filename)
+        os.Remove(temp.Name())
     })
 
     t.Run("data is nested template", func(t *testing.T) {
         str := "test"
         data := map[string]interface{}{
-            "keys": map[string]interface{}{ "test": &str },
+            "keys": map[string]interface{}{ "test": str },
         }
 
         actual, err := New("", data)
         expected := &Template{
             templates: map[string]*Template{
-                "test": &Template{text: &str},
+                "test": &Template{name: "test", text: &str},
             },
         }
 
-        if err != nil || !actual.Equal(expected) { t.Fail() }
+        if err != nil || !expected.Equal(actual) { t.Error(expected, actual, err) }
     })
 }
 
@@ -99,14 +99,31 @@ func TestTemplateEqual(t *testing.T) {
 }
 
 func TestTemplateIsNested(t *testing.T) {
-    t.Run("nested", func(t *testing.T) {
-        t := &Template{}
-        if !t.IsNested() { t.Fail() }
+    t.Run("untested", func(t *testing.T) {
+        t1 := &Template{}
+        if t1.IsNested() { t.Fail() }
     })
 
-    t.Run("unnested", func(t *testing.T) {
-        data := "test"
-        t := &Template{text: &data}
-        if t.IsNested() { t.Fail() }
+    t.Run("nested", func(t *testing.T) {
+        t1 := &Template{
+            templates: map[string]*Template{},
+        }
+        if !t1.IsNested() { t.Fail() }
     })
+}
+
+func TestTemplateRender(t *testing.T) {
+
+}
+
+func TestTemplateRenderYaml(t *testing.T) {
+
+}
+
+func TestTemplateRenderJson(t *testing.T) {
+
+}
+
+func TestTemplateRenderMap(t *testing.T) {
+
 }

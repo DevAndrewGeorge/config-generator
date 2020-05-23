@@ -1,7 +1,43 @@
 package templates
 
+import(
+    "io/ioutil"
+    "github.com/devandrewgeorge/config-generator/internal/pkg/errors"
+)
+
 func New(name string, data interface{}) (*Template, error) {
-    return &Template{}, nil
+    template := &Template{name: name}
+    switch data.(type) {
+    case nil:
+    case string:
+        converted := data.(string)
+        template.text = &converted
+    case map[string]interface{}:
+        converted := data.(map[string]interface{})
+        if filename, found := converted["file"]; found {
+            content, err := ioutil.ReadFile(filename.(string))
+            if err != nil { return nil, err }
+            temp := string(content)
+            template.text = &temp
+            break
+        } else if _, found := converted["keys"]; found {
+            template.templates = map[string]*Template{}
+            for k, v := range converted["keys"].(map[string]interface{}) {
+                child, err := New(k, v)
+                if err != nil { return nil, err }
+                template.templates[k] = child
+            }
+        } else {
+            return nil, &errors.TemplateError{}
+        }
+
+
+    default:
+        return nil, &errors.TemplateError{}
+    }
+
+
+    return template, nil
 }
 
 type Template struct {
@@ -11,7 +47,7 @@ type Template struct {
 }
 
 func (t *Template) IsNested() bool {
-    return t.text == nil
+    return t.templates != nil
 }
 
 func (t *Template) Render(variables map[string]string) (string, error) {
@@ -24,6 +60,10 @@ func (t *Template) RenderYaml(variables map[string]string) (string, error) {
 
 func (t *Template) RenderJson(variables map[string]string) (string, error) {
     return "", nil
+}
+
+func (t *Template) RenderMap(variables map[string]string) (map[string]interface{}, error) {
+    return map[string]interface{}{}, nil
 }
 
 func (t *Template) Equal(o *Template) bool {
