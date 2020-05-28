@@ -87,7 +87,22 @@ func (t *Template) RenderJson(variables map[string]string) (string, error) {
 }
 
 func (t *Template) RenderMap(variables map[string]string) (map[string]interface{}, error) {
-    return map[string]interface{}{}, nil
+    if !t.IsNested() { return nil, &errors.TemplateError{} }
+    if len(t.templates) == 0 { return map[string]interface{}{}, nil }
+
+    rendered := map[string]interface{}{}
+    for key, child := range t.templates {
+        var err error
+        if child.IsNested() {
+            rendered[key], err = child.RenderMap(variables)
+            if err != nil { return nil, err }
+        } else {
+            rendered[key], err = child.Render(variables)
+            if err != nil { return nil, err }
+        }
+    }
+
+    return rendered, nil
 }
 
 func (t *Template) Equal(o *Template) bool {

@@ -178,5 +178,78 @@ func TestTemplateRenderJson(t *testing.T) {
 }
 
 func TestTemplateRenderMap(t *testing.T) {
+    t.Run("flat template", func(t *testing.T) {
+        obj := &Template{}
+        if _, err := obj.RenderMap(nil); err == nil { t.Fail() }
+    })
 
+    t.Run("no templates", func(t *testing.T) {
+        obj := &Template{templates: map[string]*Template{}}
+        actual, err := obj.RenderMap(nil)
+        if err != nil || len(actual) > 0 { t.Fail() }
+    })
+
+    t.Run("one static template", func(t *testing.T) {
+        text := "hello"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+        actual, err := obj.RenderMap(nil)
+        if err != nil { t.Fail(); return; }
+        if len(actual) != 1 { t.Fail(); return; }
+        if value, found := actual["child"]; !found || value.(string) != "hello" { t.Fail(); return; }
+    })
+
+    t.Run("one dynamic template", func (t *testing.T) {
+        text := "{{ .test }}"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        actual, err := obj.RenderMap(map[string]string{"test": "test"})
+        if err != nil { t.Fail(); return; }
+        child_rendered_value, converted := actual["child"].(string)
+        if !converted || child_rendered_value != "test" { t.Fail(); return; }
+    })
+
+    t.Run("invalid child template", func(t *testing.T) {
+        text := "{{ .test "
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        if _, err := obj.RenderMap(map[string]string{"test": "test"}); err == nil { t.Fail() }
+    })
+
+    t.Run("multiple templates", func(t *testing.T) {
+        hello_text, world_text := "hello", "world"
+        child1, child2 := &Template{text: &hello_text}, &Template{text: &world_text}
+        obj := &Template{templates: map[string]*Template{
+            "hello": child1,
+            "world": child2,
+        }}
+
+        actual, err := obj.RenderMap(nil)
+        if err != nil { t.Fail(); return; }
+        if len(actual) != 2 { t.Fail(); return; }
+        if actual["hello"] != "hello" || actual["world"] != "world" { t.Fail() }
+    })
+
+    t.Run("nested template", func(t *testing.T) {
+        text := "grandchild"
+        grandchild := &Template{text: &text}
+        child := &Template{templates: map[string]*Template{"grandchild": grandchild}}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        actual, err := obj.RenderMap(nil)
+
+        if err != nil { t.Fail(); return; }
+        if c, found := actual["child"]; found {
+            if gc, found := c.(map[string]interface{})["grandchild"]; !found || gc.(string) != "grandchild" {
+                t.Fail()
+                return
+            }
+        } else {
+            t.Fail();
+            return;
+        }
+
+    })
 }
