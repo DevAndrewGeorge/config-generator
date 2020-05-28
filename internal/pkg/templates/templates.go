@@ -6,6 +6,7 @@ import(
     "text/template"
     "io/ioutil"
     "encoding/json"
+    "gopkg.in/yaml.v2"
     "github.com/devandrewgeorge/config-generator/internal/pkg/errors"
 )
 
@@ -84,7 +85,6 @@ func (t *Template) Render(variables map[string]string) (string, error) {
 func (t *Template) parse_json(raw string) (interface{}, error) {
     var i interface{}
     err := json.Unmarshal([]byte(raw), &i)
-    fmt.Println(i)
 
     if err != nil {
         str := new(string)
@@ -97,7 +97,17 @@ func (t *Template) parse_json(raw string) (interface{}, error) {
 }
 
 func (t *Template) parse_yaml(raw string) (interface{}, error) {
-    return nil, nil
+    var i interface{}
+    err := yaml.Unmarshal([]byte(raw), &i)
+    return i, err
+    // if err != nil {
+    //     str := new(string)
+    //     err = json.Unmarshal([]byte(fmt.Sprintf("\"%s\"", raw)), str)
+    //
+    //     if err != nil { return nil, err }
+    //     return str, nil
+    // }
+    // return i, nil
 }
 
 func (t *Template) parse(rendered map[string]interface{}, parser parse_func) (map[string]interface{}, error) {
@@ -118,7 +128,17 @@ func (t *Template) parse(rendered map[string]interface{}, parser parse_func) (ma
 }
 
 func (t *Template) RenderYaml(variables map[string]string) (string, error) {
-    return "", nil
+    if !t.IsNested() { return "", &errors.TemplateError{} }
+
+    rendered, render_error := t.RenderMap(variables)
+    if render_error != nil { return "", render_error }
+
+    parsed, parse_error := t.parse(rendered, t.parse_yaml)
+    if parse_error != nil { return "", parse_error }
+
+    encoded, encoding_error := yaml.Marshal(parsed)
+    if encoding_error != nil { return "", encoding_error }
+    return string(encoded), nil
 }
 
 func (t *Template) RenderJson(variables map[string]string) (string, error) {

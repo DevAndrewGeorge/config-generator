@@ -2,7 +2,9 @@ package templates
 
 import (
     "os"
+    "strings"
     "encoding/json"
+    "gopkg.in/yaml.v2"
     "io/ioutil"
     "testing"
 )
@@ -171,7 +173,116 @@ func TestTemplateRender(t *testing.T) {
 }
 
 func TestTemplateRenderYaml(t *testing.T) {
+    t.Run("flat template", func (t *testing.T) {
+        obj := &Template{}
+        if _, err := obj.RenderYaml(nil); err == nil { t.Fail() }
+    })
 
+    t.Run("no children", func(t *testing.T) {
+        obj := &Template{templates: map[string]*Template{}}
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil || strings.TrimSpace(encoded) != "{}" { t.Error(err, encoded); }
+    })
+
+    t.Run("stings", func(t *testing.T) {
+        text := "hello"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]string{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"] != "hello" { t.Error(decoded); return; }
+    })
+
+    t.Run("numbers", func(t *testing.T) {
+        text := "1"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]int{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"] != 1 { t.Error(decoded); return; }
+    })
+
+    t.Run("explicit dictionary", func(t *testing.T) {
+        text := "hello: world\ngoodbye: moon"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]map[string]string{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"]["hello"] != "world" || decoded["child"]["goodbye"] != "moon" { t.Error(decoded); return; }
+    })
+
+    t.Run("nested dictionary", func(t *testing.T) {
+        text := "grandchild"
+        grandchild := &Template{text: &text}
+        child := &Template{templates: map[string]*Template{"grandchild": grandchild}}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]map[string]string{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"]["grandchild"] != "grandchild" { t.Error(decoded); return; }
+    })
+
+    t.Run("list", func(t *testing.T) {
+        text := "- hello\n- world"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string][]string{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"][0] != "hello" || decoded["child"][1] != "world" { t.Error(decoded); return; }
+    })
+
+
+    t.Run("boolean", func(t *testing.T) {
+        text := "true"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]bool{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"] != true { t.Error(decoded); return; }
+    })
+
+    t.Run("explicit null", func(t *testing.T) {
+        text := "~"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderYaml(nil)
+        if err != nil { t.Error(err); return; }
+
+        decoded := map[string]*interface{}{}
+        err = yaml.Unmarshal([]byte(encoded), &decoded)
+        if err != nil { t.Error(err); return; }
+        if decoded["child"] != nil { t.Error(decoded); return; }
+    })
 }
 
 func TestTemplateRenderJson(t *testing.T) {
@@ -276,7 +387,7 @@ func TestTemplateRenderJson(t *testing.T) {
         encoded, err := obj.RenderJson(nil)
         if err != nil { t.Fail() }
 
-        decoded := &map[string]*string{}
+        decoded := &map[string]*interface{}{}
         err = json.Unmarshal([]byte(encoded), decoded)
         if err != nil { t.Error(err); return; }
         if (*decoded)["child"] != nil { t.Fail(); return; }
