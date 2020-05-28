@@ -194,9 +194,12 @@ func TestTemplateRenderJson(t *testing.T) {
         encoded, err := obj.RenderJson(nil)
         if err != nil  { t.Error(err); return; }
 
-        decoded  := &map[string]string{}
-        err = json.Unmarshal([]byte(encoded), decoded)
+        decoded  := map[string]string{}
+        err = json.Unmarshal([]byte(encoded), &decoded)
         if err != nil { t.Error(err); return; }
+
+        //making sure text is not wrapped
+        if decoded["child"] != "child" { t.Error(decoded["child"]); return; }
     })
 
     t.Run("numbers", func(t *testing.T) {
@@ -273,9 +276,10 @@ func TestTemplateRenderJson(t *testing.T) {
         encoded, err := obj.RenderJson(nil)
         if err != nil { t.Fail() }
 
-        decoded := &map[string]map[string]*string{}
+        decoded := &map[string]*string{}
         err = json.Unmarshal([]byte(encoded), decoded)
         if err != nil { t.Error(err); return; }
+        if (*decoded)["child"] != nil { t.Fail(); return; }
     })
 }
 

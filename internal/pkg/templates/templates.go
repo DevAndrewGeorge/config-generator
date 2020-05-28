@@ -1,9 +1,11 @@
 package templates
 
 import(
+    "fmt"
     "bytes"
     "text/template"
     "io/ioutil"
+    "encoding/json"
     "github.com/devandrewgeorge/config-generator/internal/pkg/errors"
 )
 
@@ -42,6 +44,7 @@ func New(name string, data interface{}) (*Template, error) {
     return template, nil
 }
 
+type parse_func func(string) (interface{}, error)
 type Template struct {
     name string
     text *string
@@ -78,12 +81,58 @@ func (t *Template) Render(variables map[string]string) (string, error) {
     return result.String(), nil
 }
 
+func (t *Template) parse_json(raw string) (interface{}, error) {
+    var i interface{}
+    err := json.Unmarshal([]byte(raw), &i)
+    fmt.Println(i)
+
+    if err != nil {
+        str := new(string)
+        err = json.Unmarshal([]byte(fmt.Sprintf("\"%s\"", raw)), str)
+
+        if err != nil { return nil, err }
+        return str, nil
+    }
+    return i, nil
+}
+
+func (t *Template) parse_yaml(raw string) (interface{}, error) {
+    return nil, nil
+}
+
+func (t *Template) parse(rendered map[string]interface{}, parser parse_func) (map[string]interface{}, error) {
+    var err error
+    parsed := map[string]interface{}{}
+    for key, child := range rendered {
+        raw, isChild := child.(string)
+        if isChild {
+            parsed[key], err = parser(raw)
+            if err != nil { return nil, err }
+        } else {
+            parsed[key], err = t.parse(child.(map[string]interface{}), parser)
+            if err != nil { return nil, err }
+        }
+    }
+
+    return parsed, nil
+}
+
 func (t *Template) RenderYaml(variables map[string]string) (string, error) {
     return "", nil
 }
 
 func (t *Template) RenderJson(variables map[string]string) (string, error) {
-    return "", nil
+    if !t.IsNested() { return "", &errors.TemplateError{} }
+
+    rendered, render_error := t.RenderMap(variables)
+    if render_error != nil { return "", render_error }
+
+    parsed, parse_error := t.parse(rendered, t.parse_json)
+    if parse_error != nil { return "", parse_error }
+
+    encoded, encoding_error := json.MarshalIndent(parsed, "", "    ")
+    if encoding_error != nil { return "", encoding_error }
+    return string(encoded), nil
 }
 
 func (t *Template) RenderMap(variables map[string]string) (map[string]interface{}, error) {
