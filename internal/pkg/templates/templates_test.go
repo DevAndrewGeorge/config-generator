@@ -113,7 +113,60 @@ func TestTemplateIsNested(t *testing.T) {
 }
 
 func TestTemplateRender(t *testing.T) {
+    t.Run("variables is nil", func(t *testing.T) {
+        text := ""
+        obj := &Template{text: &text}
+        actual, err := obj.Render(nil)
+        if err != nil || actual != "" { t.Fail() }
+    })
 
+    t.Run("variable not found", func (t *testing.T) {
+        text := "{{ .test }}"
+        obj := &Template{text: &text}
+        if _, err := obj.Render(nil); err == nil { t.Fail() }
+    })
+
+    t.Run("nested template", func(t *testing.T) {
+        obj := &Template{
+            templates: map[string]*Template{},
+        }
+
+        if _, err := obj.Render(nil); err == nil { t.Fail() }
+    })
+
+    t.Run("nil text", func(t *testing.T) {
+        obj := &Template{}
+        actual, err := obj.Render(nil)
+        if err != nil || actual != "" { t.Fail() }
+    })
+
+    t.Run("empty text", func(t *testing.T) {
+        text := ""
+        obj := &Template{text: &text}
+        actual, err := obj.Render(nil)
+        if err != nil || actual != "" { t.Fail() }
+    })
+
+    t.Run("static text", func(t *testing.T) {
+        text := "test"
+        obj := &Template{text: &text}
+        actual, err := obj.Render(nil)
+        if err != nil || actual != "test" { t.Fail() }
+    })
+
+    t.Run("valid template text", func(t *testing.T) {
+        text := "{{ .test }}"
+        obj := &Template{text: &text}
+
+        actual, err := obj.Render(map[string]string{"test": "test"})
+        if err != nil || actual != "test" { t.Fail() }
+    })
+
+    t.Run("invalid template text", func(t *testing.T) {
+        text := "{{ .test "
+        obj := &Template{text: &text}
+        if _, err := obj.Render(nil); err == nil { t.Fail() }
+    })
 }
 
 func TestTemplateRenderYaml(t *testing.T) {

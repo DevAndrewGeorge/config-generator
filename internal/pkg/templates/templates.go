@@ -1,6 +1,8 @@
 package templates
 
 import(
+    "bytes"
+    "text/template"
     "io/ioutil"
     "github.com/devandrewgeorge/config-generator/internal/pkg/errors"
 )
@@ -51,7 +53,29 @@ func (t *Template) IsNested() bool {
 }
 
 func (t *Template) Render(variables map[string]string) (string, error) {
-    return "", nil
+    if t.IsNested() {
+        return "", &errors.TemplateError{}
+    }
+
+    if t.text == nil {
+        return "", nil
+    }
+
+    renderer := template.New(t.name)
+    renderer.Option("missingkey=error")
+    if _, err := renderer.Parse(*t.text); err != nil {
+        return "", err
+    }
+
+    result := &bytes.Buffer{}
+    if variables == nil {
+        variables = map[string]string{}
+    }
+    if err := renderer.Execute(result, variables); err != nil {
+        return "", err
+    }
+
+    return result.String(), nil
 }
 
 func (t *Template) RenderYaml(variables map[string]string) (string, error) {
