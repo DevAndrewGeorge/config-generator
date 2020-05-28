@@ -10,7 +10,7 @@ import (
 type Generator struct {
   Plugins map[string]plugins.Plugin
   Variables map[string]variables.Variable
-  Templates map[string]templates.Template
+  Templates map[string]*templates.Template
   Outputs map[string]outputs.Output
 }
 
