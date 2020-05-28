@@ -100,14 +100,6 @@ func (t *Template) parse_yaml(raw string) (interface{}, error) {
     var i interface{}
     err := yaml.Unmarshal([]byte(raw), &i)
     return i, err
-    // if err != nil {
-    //     str := new(string)
-    //     err = json.Unmarshal([]byte(fmt.Sprintf("\"%s\"", raw)), str)
-    //
-    //     if err != nil { return nil, err }
-    //     return str, nil
-    // }
-    // return i, nil
 }
 
 func (t *Template) parse(rendered map[string]interface{}, parser parse_func) (map[string]interface{}, error) {
