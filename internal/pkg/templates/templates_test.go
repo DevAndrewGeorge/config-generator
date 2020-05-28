@@ -2,6 +2,7 @@ package templates
 
 import (
     "os"
+    "encoding/json"
     "io/ioutil"
     "testing"
 )
@@ -174,7 +175,108 @@ func TestTemplateRenderYaml(t *testing.T) {
 }
 
 func TestTemplateRenderJson(t *testing.T) {
+    t.Run("flat template", func(t *testing.T) {
+        obj := &Template{}
+        if _, err := obj.RenderJson(nil); err == nil { t.Fail() }
+    })
 
+    t.Run("empty", func(t *testing.T) {
+        obj := &Template{templates: map[string]*Template{}}
+        actual, err := obj.RenderJson(nil)
+        if err != nil || actual != "{}" { t.Fail() }
+    })
+
+    t.Run("strings", func(t *testing.T) {
+        text := "child"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil  { t.Error(err); return; }
+
+        decoded  := &map[string]string{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("numbers", func(t *testing.T) {
+        text := "1"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string]int{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("in-line objects", func(t *testing.T) {
+        text := "{\"grandchild\": \"grandchild\"}"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string]map[string]string{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("nested objects", func(t *testing.T) {
+        text := "grandchild"
+        grandchild := &Template{text: &text}
+        child := &Template{templates: map[string]*Template{"grandchild": grandchild}}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string]map[string]string{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("arrays", func(t *testing.T) {
+        text := "[1, 2, 3]"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string][]int{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("booleans", func(t *testing.T) {
+        text := "true"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string]bool{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
+
+    t.Run("explicit null", func(t *testing.T) {
+        text := "null"
+        child := &Template{text: &text}
+        obj := &Template{templates: map[string]*Template{"child": child}}
+
+        encoded, err := obj.RenderJson(nil)
+        if err != nil { t.Fail() }
+
+        decoded := &map[string]map[string]*string{}
+        err = json.Unmarshal([]byte(encoded), decoded)
+        if err != nil { t.Error(err); return; }
+    })
 }
 
 func TestTemplateRenderMap(t *testing.T) {
