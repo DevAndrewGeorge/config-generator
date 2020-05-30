@@ -10,7 +10,7 @@ type Variable struct {
 	validators []validators.Validator `yaml:"validate"`
 }
 
-func (v Variable) Equal(o Variable) bool {
+func (v *Variable) Equal(o Variable) bool {
   if v.required != o.required {
     return false
   }
