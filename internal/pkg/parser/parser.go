@@ -22,18 +22,33 @@ func Parse(config_raw []byte) (*generator.Generator, error) {
 
   var config GeneratorConfig
   if err := yaml.UnmarshalStrict(config_raw, &config); err != nil {
-    log.Error(err.Error())
-    return nil, &errors.ConfigError{}
+      log.Error(err.Error())
+      return nil, &errors.ConfigError{}
   }
 
+  //
   g := generator.New()
+
+  // plugins
   if plugins, err := parsePlugins(config.Plugins); err != nil {
     return nil, err
   } else {
-    for plugin_name, plugin := range plugins {
-      g.Plugins[plugin_name] = plugin
-    }
+      // overwriting existing plugins if necessary
+      for plugin_name, plugin := range plugins {
+          g.Plugins[plugin_name] = plugin
+      }
   }
 
+  // variables
+
+  // templates
+  if templates, err := parseTemplates(config.Templates); err != nil {
+      return nil, err
+  } else {
+      g.Templates = templates
+  }
+
+  // outputs
+  
   return g, nil
 }

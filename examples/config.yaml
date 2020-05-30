@@ -85,94 +85,109 @@ variables:
     # Defaults to checking if returned value is not the empty string.
     validate:
     - regex: .+
-    static: hello world
+    plugin:
+      static: hello world
 
   # Exposes to templates a dictionary whose keys are environment variable names.
   environment-variable-1:
-    environment:
+    plugin:
+      environment:
 
   # Exposes to templates a string whose value is the value of the environment variable named.
   environment-variable-2:
-    environment: ENVIRONMENT_VARIABLE_NAME
+    plugin:
+      environment: ENVIRONMENT_VARIABLE_NAME
 
   # Exposes to templates a string whose value is the content of the file.
   file-variable-1:
-    file: /path/to/file
+    plugin:
+      file: /path/to/file
 
   # Exposes to templates a dictionary whose keys are filenames and whose values are the file contents.
   # Keys are base names.
   file-variable-2:
-    file: /path/to/directory
+    plugin:
+      file: /path/to/directory
 
   # Exposes to templates the response body of an HTTP request.
   # "verify" has no effect on HTTP requests.
   # "body" has no effect on HTTP methods that do not require a body.
   http-variable-1:
-    http:
-      url: https://localhost
-      verify: true
-      method: post
-      headers: {}
-      body: {}
+    plugin:
+      http:
+        url: https://localhost
+        verify: true
+        method: post
+        headers: {}
+        body: {}
 
   # Exposes to templates a dictionary whose keys are keys in the ConfigMap/Secret and whose values are associated plaintext.
   # "kind" be be either "ConfigMap" or "Secret".
   kubernetes-variable-1:
-    kubernetes:
-      apiVersion: v1
-      kind: ConfigMap
-      namespace: desired-namespace
-      name: name-of-configmap-or-secret
+    plugin:
+      kubernetes:
+        apiVersion: v1
+        kind: ConfigMap
+        namespace: desired-namespace
+        name: name-of-configmap-or-secret
 
   # Exposes to templates a string whose value is received from the prompted user.
   # If marked sensitive (the default), no input will be echoed to the console.
   # Otherwise, keystrokes will be echoed back to the user.
   console-variable-1:
-    console:
+    plugin:
+      console:
 
   # Exposes to templates a string whose value is explicitly defined here.
   static-variable-1:
-    static: some text
+    plugin:
+      static: some text
 
   # Exposes to templates a string whose value is the output of the script.
   script-variable-1:
-    script: |
-      echo hello
+    plugin:
+      script: |
+        echo hello
 
   # Exposes to templates a string whose value is the output of the script.
   script-variable-2:
-    script:
-      path: /path/to/script
+    plugin:
+      script:
+        path: /path/to/script
 
   # Exposes to templates a dictionary representing Vault's response.
   vault-variable-1:
-    named-vault-plugin: # /path/in/vault
-      path: /path/in/vault
-      method: get
+    plugin:
+      named-vault-plugin: # /path/in/vault
+        path: /path/in/vault
+        method: get
 
   # Exposes to templates a dictionary representing Vault's response.
   vault-variable-2:
-    vault:
-      path: /path/in/vault
-      method: post
-      body:
-        parameter1: foo
-        parameter2:
-          parameter3: bar
+    plugin:
+      vault:
+        path: /path/in/vault
+        method: post
+        body:
+          parameter1: foo
+          parameter2:
+            parameter3: bar
 
   # Iterates through a list of plugins until one returns a validated value or the list is exhausted.
   multi-variable-1:
-    multi:
-    - file: /path/that/does/not/exist
-    - environment: ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST
-    - static: 8.8.8.8
+    plugin:
+      multi:
+      - file: /path/that/does/not/exist
+      - environment: ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST
+      - static: 8.8.8.8
 
   # Below is an ehaustive list of all validation tests.
   validate-example:
     validate:
     - regex: "[0-9.]+"
     - command: ping -c 1 {{ validate-example }}
-    static: 8.8.8.8
+    plugin:
+      static: 8.8.8.8
 
 
 
@@ -239,7 +254,7 @@ templates:
 
 # `outputs`
 # This section outputs templates.
-# Structure: [output name] > {template, redact:bool, show:bool, format:(yaml, json), string:bool, [cosmetic plugin name]}
+# Structure: [output name] > {template, redact:bool, show:bool, format:(yaml, json), string:bool, plugin}
 # "show" will print the rendered template to the console for an output that would not otherwise print to the console. Defaults to false.
 # "redact" will redact variables marked as "secret" that are used in rendered templates that are printed to the console (e.g. "PASSWORD" becomes P******D"). Defaults to true.
 # "format" will coerce a dictionary template into a particular format. Defaults to "yaml". It has no effect on string templates.
@@ -249,30 +264,35 @@ outputs:
   # Outputs a simple string to the console.
   console-output-1:
     template: flat-inline-template
-    console:
+    plugin:
+      console:
 
   # Outputs JSON to the console.
   console-output-2:
     template: nested-template
     format: json
-    console:
+    plugin:
+      console:
 
   # Outputs YAML to the console.
   console-output-3:
     template: nested-template
     format: yaml
-    console:
+    plugin:
+      console:
 
   # Injects the environment variable HELLO whose value is the rendered flat-inline-template.
   environment-output-1:
     template: flat-inline-template
-    environment:
-      key: HELLO
+    plugin:
+      environment:
+        key: HELLO
 
   # Injects the environment variables HELLO and GOODBYE whose values are define in the rendered environment-flat-template.
   environment-output-2:
     template: environment-flat-template
-    environment:
+    plugin:
+      environment:
 
   # Injects environment variables HELLO, GOODBYE, and SPANISH.
   # When using a nested template, only top-level keys are injected.
@@ -280,50 +300,56 @@ outputs:
   environment-output-3:
     template: environment-nested-template
     format: json
-    environment:
+    plugin:
+      environment:
 
   # Outputs the rendered flat-inline-template as a file.
   file-output-1:
     template: flat-inline-template
-    file: /path/to/file
+    plugin:
+      file: /path/to/file
 
   # Outputs the rendered nested-template in a directory structure.
   # Keys whose values are nested templates will create directories.
   # Keys whose values are flat templates will create files.
   file-output-2:
     template: nested-template
-    file: /path/to/directory
+    plugin:
+      file: /path/to/directory
 
   # Submits the rendered template as the body of an HTTP "method" request to the given URL.
   http-output-1:
     template: flat-inline-template
-    http:
-      url: https://localhost
-      verify: true
-      method: post
-      headers: {}
+    plugin:
+      http:
+        url: https://localhost
+        verify: true
+        method: post
+        headers: {}
 
   # Submits the rendered and coerced template as the body of an HTTP "method" request to the given URL.
   http-output-2:
     template: nested-template
     format: json
-    http:
-      url: https://example.com
-      verify: true
-      method: post
-      headers: {}
+    plugin:
+      http:
+        url: https://example.com
+        verify: true
+        method: post
+        headers: {}
 
   # Creates a ConfigMap or Secret.
   # If name is omitted, defaults to the name of the template.
   # If key is omitted, defaults to the name of the template.
   kubernetes-output-1:
     template: flat-inline-template
-    kubernetes:
-      apiVersion: v1
-      kind: ConfigMap
-      namespace: desired-namespace
-      name: name-of-configmap-or-secret
-      key: key-name
+    plugin:
+      kubernetes:
+        apiVersion: v1
+        kind: ConfigMap
+        namespace: desired-namespace
+        name: name-of-configmap-or-secret
+        key: key-name
 
   # Creates a ConfigMap or Secret whose keys are top-level keys in the nested template.
   # Any keys whose values are nested templates will be coerced into strings of type "format".
@@ -331,36 +357,41 @@ outputs:
   kubernetes-output-2:
     template: nested-template
     format: json
-    kubernetes:
-      apiVersion: v1
-      kind: ConfigMap # (or Secret)
-      namespace: desired-namespace
-      name: name-of-configmap-or-secret
+    plugin:
+      kubernetes:
+        apiVersion: v1
+        kind: ConfigMap # (or Secret)
+        namespace: desired-namespace
+        name: name-of-configmap-or-secret
 
   # Runs the rendered template as a script.
   script-output-1:
     template: script-flat-template
-    script:
+    plugin:
+      script:
 
   # Runs each top-level key as a script.
   # Take care not to have top-level keys whose values are nested templates.
   script-output-2:
     template: script-nested-template
-    script:
+    plugin:
+      script:
 
   # Makes a request to Vault at the given path.
   # The rendered template will become the body of the request if reasonable.
   vault-output-1:
     template: vault-static-template
-    vault:
-      path: /secret/data/example
-      method: post
+    plugin:
+      vault:
+        path: /secret/data/example
+        method: post
 
   # Makes a request to Vault at the given path.
   # The rendered template will become the body of the request if reasonable.
   # This is the equivalent of taking a nested template and coercing it into a json string.
   vault-output-2:
     template: vault-nested-template
-    vault:
-      path: /secret/data/example
-      method: post
+    plugin:
+      vault:
+        path: /secret/data/example
+        method: post
