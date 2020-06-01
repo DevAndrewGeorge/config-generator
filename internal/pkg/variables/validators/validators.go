@@ -1,7 +1,18 @@
 package validators
 
-type Validator struct {}
+func New(validator_type string, config interface{}) (Validator, error) {
+    var v Validator
+    switch validator_type {
+    case "regex":
+    default:
 
-func (v Validator) Equal(o Validator) bool {
-  return v == o
+    }
+
+    return v, nil
+}
+
+type Validator interface {
+    Equal(o Validator) bool
+    Validate(test string) bool
+    configure(config interface{}) error
 }
